@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FitMe – Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=Instrument+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+
+/* ── TOKENS ── */
+:root {
+  /* Nike-inspired gradient palette */
+  --g-start:  #f5c4a0;   /* warm peach */
+  --g-mid1:   #e8886a;   /* coral */
+  --g-mid2:   #c94f6d;   /* deep rose */
+  --g-mid3:   #8b4a8c;   /* purple */
+  --g-end:    #3d3070;   /* deep violet */
+
+  --bg-grad: linear-gradient(165deg,
+    #f5c4a0 0%,
+    #ed9474 18%,
+    #d9614e 35%,
+    #c24466 52%,
+    #8f4a90 68%,
+    #5a3880 82%,
+    #3d3070 100%);
+
+  --surface:  rgba(255,255,255,0.14);
+  --surface2: rgba(255,255,255,0.08);
+  --border:   rgba(255,255,255,0.22);
+  --border2:  rgba(255,255,255,0.10);
+  --text:     #ffffff;
+  --text2:    rgba(255,255,255,0.62);
+  --text3:    rgba(255,255,255,0.35);
+  --shadow:   rgba(40,20,50,0.25);
+  --shadow2:  rgba(40,20,50,0.12);
+}
+
+body {
+  font-family: 'Instrument Sans', sans-serif;
+  background: #1a0f1e;
+  min-height: 100vh;
+  padding: 52px 24px 72px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ── AMBIENT ── */
+.amb {
+  position: fixed; border-radius: 50%;
+  pointer-events: none; z-index: 0; filter: blur(130px);
+}
+.a1 { width:700px;height:700px; background:radial-gradient(circle,rgba(200,100,80,0.35) 0%,transparent 70%); top:-200px;left:-150px; }
+.a2 { width:600px;height:600px; background:radial-gradient(circle,rgba(100,50,120,0.30) 0%,transparent 70%); bottom:-150px;right:-100px; }
+.a3 { width:400px;height:400px; background:radial-gradient(circle,rgba(180,80,100,0.20) 0%,transparent 70%); top:40%;left:45%; }
+
+/* ── PAGE HEADER ── */
+.ph {
+  position: relative; z-index: 10;
+  text-align: center; margin-bottom: 52px;
+}
+.ph .tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.ph .tag::before, .ph .tag::after {
+  content: ''; flex: 1; max-width: 50px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.30));
+}
+.ph h1 {
+  font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 900;
+  color: #fff; letter-spacing: -1px; font-style: italic;
+  background: var(--bg-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.ph p { font-size: 13px; color: rgba(255,255,255,0.38); margin-top: 6px; font-weight: 400; }
+
+/* ── SCREENS ── */
+.screens {
+  display: flex; gap: 18px; align-items: flex-start;
+  flex-wrap: nowrap; justify-content: center;
+  overflow-x: auto; padding-bottom: 16px;
+  position: relative; z-index: 2;
+}
+.sw { display: flex; flex-direction: column; align-items: center; }
+.slabel {
+  margin-top: 14px; font-size: 9px; font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,0.28);
+}
+
+/* ── PHONE ── */
+.phone {
+  width: 290px; flex-shrink: 0;
+  border-radius: 50px;
+  background: var(--bg-grad);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.06),
+    0 40px 100px rgba(40,10,50,0.65),
+    0 8px 30px rgba(200,80,80,0.15),
+    0 1px 0 rgba(255,255,255,0.25) inset;
+  overflow: hidden; padding-bottom: 16px;
+  opacity: 0; transform: translateY(28px) scale(.97);
+  animation: up .8s cubic-bezier(.22,.68,0,1.1) forwards;
+  position: relative;
+}
+/* top highlight */
+.phone::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
+  z-index: 99;
+}
+/* noise grain */
+.phone::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50px; pointer-events: none; z-index: 1;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: .6;
+}
+.phone:nth-child(1){ animation-delay:.04s }
+.phone:nth-child(2){ animation-delay:.13s }
+.phone:nth-child(3){ animation-delay:.22s }
+.phone:nth-child(4){ animation-delay:.31s }
+.phone:nth-child(5){ animation-delay:.40s }
+@keyframes up { to { opacity:1; transform:none; } }
+
+/* ── STATUS BAR ── */
+.sb {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 17px 24px 8px; position: relative; z-index: 5;
+  font-family: 'Instrument Sans', sans-serif; font-size: 11px; font-weight: 600; color: var(--text);
+}
+.island {
+  background: rgba(0,0,0,0.55); border-radius: 20px; padding: 6px 14px;
+  display: flex; gap: 5px; align-items: center;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.id { width:5px;height:5px;border-radius:50%;background:rgba(0,0,0,0.6); }
+.ic { width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,0.5); }
+
+/* ── CONTENT ── */
+.sc { padding: 4px 18px 0; position: relative; z-index: 2; }
+.sbadge {
+  display: block; font-size: 9px; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--text3); padding-bottom: 10px;
+}
+
+/* greeting */
+.greet { margin-bottom: 20px; }
+.greet .hi { font-size: 11px; color: var(--text3); font-weight: 400; margin-bottom: 2px; }
+.greet .name {
+  font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 900;
+  color: var(--text); letter-spacing: -.3px; line-height: 1.1; font-style: italic;
+}
+.greet-row { display: flex; justify-content: space-between; align-items: flex-start; }
+.av {
+  width: 40px; height: 40px; border-radius: 14px; margin-top: 2px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+  backdrop-filter: blur(20px);
+}
+
+/* ── GLASS CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 26px; padding: 18px;
+  margin-bottom: 10px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 4px 24px var(--shadow2), 0 1px 0 rgba(255,255,255,0.18) inset;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  pointer-events: none;
+}
+
+/* ── HERO ── */
+.hero {
+  background: rgba(0,0,0,0.22);
+  border-color: rgba(255,255,255,0.18);
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+}
+.hc-label { font-size: 9px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.hc-num {
+  font-family: 'Playfair Display', serif; font-size: 46px; font-weight: 900;
+  color: var(--text); line-height: 1; letter-spacing: -2px; font-style: italic;
+  text-shadow: 0 2px 20px rgba(255,255,255,0.20);
+}
+.hc-unit { font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--text2); margin-left: 4px; }
+.hc-sub { font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+/* progress */
+.pbar { height: 2px; background: rgba(255,255,255,0.15); border-radius: 20px; margin-top: 16px; overflow: visible; position: relative; }
+.pfill {
+  height: 100%; border-radius: 20px;
+  background: rgba(255,255,255,0.90);
+  box-shadow: 0 0 10px 2px rgba(255,255,255,0.50), 0 0 24px 4px rgba(255,220,200,0.30);
+  animation: breathe 3s ease-in-out infinite; position: relative;
+}
+.pfill::after {
+  content: ''; position: absolute; right: -5px; top: 50%; transform: translateY(-50%);
+  width: 10px; height: 10px; border-radius: 50%;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.20), 0 0 14px 4px rgba(255,255,255,0.55);
+  animation: breathedot 3s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100%{ box-shadow:0 0 10px 2px rgba(255,255,255,0.50),0 0 24px 4px rgba(255,220,200,0.30); }
+  50%{ box-shadow:0 0 16px 4px rgba(255,255,255,0.70),0 0 36px 8px rgba(255,220,200,0.50); }
+}
+@keyframes breathedot {
+  0%,100%{ box-shadow:0 0 0 3px rgba(255,255,255,0.20),0 0 14px 4px rgba(255,255,255,0.55); }
+  50%{ box-shadow:0 0 0 3px rgba(255,255,255,0.30),0 0 20px 6px rgba(255,255,255,0.75); }
+}
+
+/* chips */
+.chips { display: flex; gap: 6px; margin-top: 14px; }
+.chip {
+  flex: 1; padding: 10px 8px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 16px; backdrop-filter: blur(16px);
+}
+.chip .cl { font-size: 8px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); }
+.chip .cv { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--text); margin-top: 2px; letter-spacing: -.3px; }
+.chip .cu { font-size: 8px; color: var(--text3); }
+
+/* section */
+.sec { font-size: 9px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text3); margin: 12px 0 8px; }
+
+/* makros */
+.mkrow { display: flex; gap: 7px; }
+.mk {
+  flex: 1;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 22px; padding: 13px 10px;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  position: relative; overflow: hidden;
+}
+.mk::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent); }
+.me { font-size: 14px; margin-bottom: 5px; }
+.mn { font-size: 8px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); }
+.mv { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.mu { font-size: 8px; color: var(--text3); }
+.mkbar { height: 2px; border-radius: 10px; background: rgba(255,255,255,0.12); margin-top: 7px; }
+.mkf { height: 100%; border-radius: 10px; background: rgba(255,255,255,0.75); }
+.mkf1 { width: 55%; }
+.mkf2 { width: 70%; }
+.mkf3 { width: 40%; }
+
+/* row item */
+.ri {
+  display: flex; align-items: center; gap: 11px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 12px 14px; margin-bottom: 8px;
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  position: relative; overflow: hidden;
+}
+.ri::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.ri-ico {
+  width: 40px; height: 40px; border-radius: 13px; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+}
+.ri-body { flex: 1; }
+.ri-body h3 { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -.1px; }
+.ri-body p { font-size: 10px; color: var(--text3); margin-top: 1px; }
+.ri-right { text-align: right; }
+.ri-right .rv { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--text); }
+.ri-right .rl { font-size: 9px; color: var(--text3); }
+
+/* badge */
+.badge {
+  font-size: 9px; font-weight: 600; padding: 5px 11px; border-radius: 20px;
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--text2);
+  backdrop-filter: blur(10px);
+}
+.badge.go { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.35); color: #fff; }
+.badge.ok { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.20); color: var(--text2); }
+
+/* nav */
+.nav {
+  margin: 12px 16px 0;
+  background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 26px; padding: 10px 4px 8px;
+  display: flex; justify-content: space-around;
+  backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+  box-shadow: 0 4px 24px var(--shadow), 0 1px 0 rgba(255,255,255,0.12) inset;
+  position: relative; overflow: hidden; z-index: 2;
+}
+.nav::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.30),transparent); }
+.ni { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; min-width: 46px; }
+.ni .ico { font-size: 18px; }
+.ni .lbl { font-size: 7.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--text3); }
+.ni.on .lbl { color: rgba(255,255,255,0.90); }
+.ni .dot { width: 3px; height: 3px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px 2px rgba(255,255,255,0.60); }
+
+/* week */
+.week { display: flex; gap: 5px; margin-bottom: 10px; }
+.wd {
+  flex: 1; text-align: center; padding: 8px 2px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 16px;
+}
+.wd.done { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.28); }
+.wd.active { background: rgba(255,255,255,0.22); border-color: rgba(255,255,255,0.50); box-shadow: 0 0 14px rgba(255,255,255,0.15); }
+.wd.skip { background: rgba(0,0,0,0.20); border-color: rgba(255,255,255,0.08); }
+.wdd { font-size: 7px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.wdn { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--text); margin-top: 2px; }
+.wdi { font-size: 10px; margin-top: 1px; }
+
+/* exercise */
+.ex {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 12px 13px; margin-bottom: 8px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+}
+.ex::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.exh { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.exn {
+  width: 22px; height: 22px; border-radius: 8px; flex-shrink: 0;
+  background: var(--surface2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--text);
+}
+.exh .en { font-size: 12px; font-weight: 600; color: var(--text); flex: 1; }
+.exh .ck { font-size: 11px; }
+.sets { display: flex; gap: 5px; }
+.s {
+  flex: 1; text-align: center;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 11px; padding: 7px 3px;
+}
+.s.done { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.30); }
+.sl { font-size: 7px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--text3); }
+.sv { font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; color: var(--text); margin-top: 1px; }
+
+/* stats 3 */
+.stat3 { display: flex; gap: 7px; margin-bottom: 10px; }
+.sc3 {
+  flex: 1; text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 13px 6px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+}
+.sc3::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.sc3 .sei { font-size: 15px; margin-bottom: 4px; }
+.sc3 .sel { font-size: 8px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); }
+.sc3 .sev { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -.3px; margin-top: 2px; }
+.sc3 .seu { font-size: 8px; color: var(--text3); }
+
+/* wochenbilanz */
+.wbal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 14px; margin-bottom: 9px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+}
+.wbal::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.wbal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.wbal-lbl { font-size: 9px; font-weight: 600; letter-spacing: .10em; text-transform: uppercase; color: var(--text3); }
+.wbal-num { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--text); margin-top: 2px; letter-spacing: -.5px; font-style: italic; }
+.wbal-days { display: flex; gap: 4px; }
+.wbd { flex:1; border-radius:10px; padding:7px 3px; text-align:center; background:var(--surface2); border:1px solid var(--border2); }
+.wbd .dn { font-size: 7px; font-weight: 700; text-transform: uppercase; color: var(--text3); }
+.wbd .dv { font-size: 10px; font-weight: 700; color: var(--text); margin-top: 2px; }
+.wbd.neg .dv { color: rgba(255,255,255,0.90); }
+.wbd.pos .dv { color: rgba(255,200,190,0.80); }
+.wbd.zero .dv { color: var(--text3); }
+
+/* chart */
+.wch {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 14px; margin-bottom: 9px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+}
+.wch::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.wch-lbl { font-size: 9px; font-weight: 600; letter-spacing: .10em; text-transform: uppercase; color: var(--text3); margin-bottom: 12px; }
+.wch-bars { display: flex; align-items: flex-end; gap: 5px; height: 48px; }
+.bar { flex: 1; border-radius: 5px 5px 0 0; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.10); }
+.bar.hi { background: rgba(255,255,255,0.35); border-color: rgba(255,255,255,0.40); box-shadow: 0 -4px 12px rgba(255,255,255,0.20); }
+.wch-days { display: flex; gap: 5px; margin-top: 6px; }
+.wch-days span { flex:1; text-align:center; font-size:7px; color:var(--text3); font-weight:600; }
+
+/* streak */
+.streak { display: flex; gap: 5px; margin-bottom: 9px; }
+.sd {
+  flex: 1; height: 28px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; color: var(--text3);
+  background: var(--surface2); border: 1px solid var(--border2);
+}
+.sd.on { background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.32); color: rgba(255,255,255,0.80); }
+.sd.now { background: rgba(255,255,255,0.28); border-color: rgba(255,255,255,0.55); color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.20); }
+
+/* feedback */
+.feedback {
+  background: rgba(0,0,0,0.20); border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 20px; padding: 14px; margin-bottom: 8px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+}
+.feedback::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent); }
+.fb-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--text); font-style: italic; margin-bottom: 6px; }
+.fb-text { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.fb-badge { display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:10px;font-weight:600;color:#fff;background:rgba(255,255,255,0.16);padding:5px 11px;border-radius:20px;border:1px solid rgba(255,255,255,0.28); }
+
+/* ai button */
+.ai-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(0,0,0,0.22); border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 18px; padding: 12px 14px; margin-bottom: 9px;
+  backdrop-filter: blur(20px); position: relative; overflow: hidden;
+  box-shadow: 0 0 20px rgba(255,255,255,0.06);
+}
+.ai-btn::before { content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.40),transparent); }
+.ai-ico { font-size: 18px; z-index: 1; }
+.ai-t { font-size: 12px; font-weight: 600; color: var(--text); z-index: 1; }
+.ai-s { font-size: 10px; color: var(--text3); margin-top: 1px; z-index: 1; }
+
+/* alert strip */
+.alert-strip {
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 13px; padding: 9px 12px; margin-top: 12px;
+}
+.alert-strip .at { font-size: 9px; font-weight: 700; color: #fff; letter-spacing: .08em; text-transform: uppercase; }
+.alert-strip .as { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+/* profile */
+.prof-head { text-align: center; margin-bottom: 14px; }
+.prof-av {
+  width: 58px; height: 58px; border-radius: 20px; margin: 0 auto 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 24px;
+  box-shadow: 0 0 24px rgba(255,255,255,0.12);
+  backdrop-filter: blur(20px);
+}
+.prof-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: var(--text); font-style: italic; }
+.prof-sub { font-size: 10px; color: var(--text3); margin-top: 2px; }
+.prow {
+  display: flex; align-items: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 11px 13px; margin-bottom: 7px;
+  backdrop-filter: blur(16px); position: relative; overflow: hidden;
+}
+.prow::before { content:'';position:absolute;top:0;left:25%;right:25%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent); }
+.prow .pi { font-size: 13px; margin-right: 10px; }
+.prow .pk { font-size: 11px; font-weight: 500; color: var(--text2); flex: 1; }
+.prow .pv { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; color: var(--text); letter-spacing: -.2px; }
+</style>
+</head>
+<body>
+
+<div class="amb a1"></div>
+<div class="amb a2"></div>
+<div class="amb a3"></div>
+
+<div class="ph">
+  <div class="tag">FitMe App · Editorial Design</div>
+  <h1>FitMe</h1>
+  <p>Nike-inspired · Warm Gradient · 5 Screens</p>
+</div>
+
+<div class="screens">
+
+  <!-- ① DASHBOARD -->
+  <div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><div class="island"><div class="id"></div><div class="ic"></div></div><span>100%</span></div>
+    <div class="sc">
+      <span class="sbadge">① Home</span>
+      <div class="greet-row">
+        <div class="greet"><div class="hi">Guten Morgen</div><div class="name">Lukas</div></div>
+        <div class="av">💪</div>
+      </div>
+
+      <div class="card hero">
+        <div class="hc-label">Kalorien heute</div>
+        <div><span class="hc-num">1.240</span><span class="hc-unit">kcal</span></div>
+        <div class="hc-sub">760 noch übrig · Ziel 2.000</div>
+        <div class="pbar"><div class="pfill" style="width:62%"></div></div>
+        <div class="chips">
+          <div class="chip"><div class="cl">Gegessen</div><div class="cv">1.240</div><div class="cu">kcal</div></div>
+          <div class="chip"><div class="cl">Verbrannt</div><div class="cv">380</div><div class="cu">kcal</div></div>
+          <div class="chip"><div class="cl">Netto</div><div class="cv">860</div><div class="cu">kcal</div></div>
+        </div>
+      </div>
+
+      <div class="sec">Makros</div>
+      <div class="mkrow">
+        <div class="mk"><div class="me">🥩</div><div class="mn">Protein</div><div class="mv">82<span class="mu">g</span></div><div class="mkbar"><div class="mkf mkf1"></div></div><div style="font-size:7px;color:var(--text3);margin-top:3px;">150g</div></div>
+        <div class="mk"><div class="me">🍚</div><div class="mn">Carbs</div><div class="mv">140<span class="mu">g</span></div><div class="mkbar"><div class="mkf mkf2"></div></div><div style="font-size:7px;color:var(--text3);margin-top:3px;">200g</div></div>
+        <div class="mk"><div class="me">🥑</div><div class="mn">Fett</div><div class="mv">26<span class="mu">g</span></div><div class="mkbar"><div class="mkf mkf3"></div></div><div style="font-size:7px;color:var(--text3);margin-top:3px;">65g</div></div>
+      </div>
+
+      <div class="sec">Heute</div>
+      <div class="ri"><div class="ri-ico">🦵</div><div class="ri-body"><h3>Beine + Bauch</h3><p>6 Übungen · ~45 Min</p></div><div class="badge go">Heute</div></div>
+      <div class="ri"><div class="ri-ico">💧</div><div class="ri-body"><h3>Wasser</h3><p>1.4 L von 2.5 L</p></div><div class="badge ok">56%</div></div>
+    </div>
+    <div class="nav">
+      <div class="ni on"><div class="ico">⌂</div><div class="lbl">Home</div><div class="dot"></div></div>
+      <div class="ni"><div class="ico">◎</div><div class="lbl">Essen</div></div>
+      <div class="ni"><div class="ico">◈</div><div class="lbl">Training</div></div>
+      <div class="ni"><div class="ico">↗</div><div class="lbl">Stats</div></div>
+      <div class="ni"><div class="ico">◉</div><div class="lbl">Profil</div></div>
+    </div>
+  </div>
+  <div class="slabel">① Dashboard</div>
+  </div>
+
+  <!-- ② ERNÄHRUNG -->
+  <div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><div class="island"><div class="id"></div><div class="ic"></div></div><span>100%</span></div>
+    <div class="sc">
+      <span class="sbadge">② Ernährung</span>
+      <div class="greet"><div class="hi">Dienstag · dynamisch</div><div class="name">Mahlzeiten</div></div>
+
+      <div class="card hero" style="padding:16px 18px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+          <div><div class="hc-label">Gesamt</div><span class="hc-num">1.310</span><span class="hc-unit">kcal</span></div>
+          <div style="text-align:right;"><div class="hc-label">Protein</div><span class="hc-num">103</span><span class="hc-unit">g</span></div>
+        </div>
+        <div class="pbar"><div class="pfill" style="width:65%"></div></div>
+        <div class="alert-strip">
+          <div class="at">Abendessen angepasst</div>
+          <div class="as">Noch ~490 kcal · 47g Protein übrig</div>
+        </div>
+      </div>
+
+      <div class="ai-btn">
+        <div class="ai-ico">✦</div>
+        <div><div class="ai-t">KI-Mahlzeit generieren</div><div class="ai-s">Passend zu deinen restlichen Makros</div></div>
+      </div>
+
+      <div class="sec">Heute</div>
+      <div class="ri"><div class="ri-ico">🍳</div><div class="ri-body"><h3>Frühstück</h3><p>Rühreier · Vollkorn · Milch</p></div><div class="ri-right"><div class="rv">510</div><div class="rl">kcal · 41g P</div></div></div>
+      <div class="ri"><div class="ri-ico">🍗</div><div class="ri-body"><h3>Mittagessen</h3><p>Hähnchen · Reis · Brokkoli</p></div><div class="ri-right"><div class="rv">590</div><div class="rl">kcal · 48g P</div></div></div>
+      <div class="ri"><div class="ri-ico">🌮</div><div class="ri-body"><h3>Döner <span style="font-size:9px;color:rgba(255,255,255,0.55);">KI erkannt</span></h3><p>~680 kcal geschätzt</p></div><div class="ri-right"><div class="rv">210</div><div class="rl">kcal · 22g P</div></div></div>
+      <div class="ri" style="opacity:.36;border-style:dashed;">
+        <div class="ri-ico">🐟</div><div class="ri-body"><h3>Abendessen</h3><p>~490 kcal empfohlen</p></div>
+        <div class="ri-right"><div class="rv" style="color:var(--text3);">–</div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ico">⌂</div><div class="lbl">Home</div></div>
+      <div class="ni on"><div class="ico">◎</div><div class="lbl">Essen</div><div class="dot"></div></div>
+      <div class="ni"><div class="ico">◈</div><div class="lbl">Training</div></div>
+      <div class="ni"><div class="ico">↗</div><div class="lbl">Stats</div></div>
+      <div class="ni"><div class="ico">◉</div><div class="lbl">Profil</div></div>
+    </div>
+  </div>
+  <div class="slabel">② Essen · dynamisch</div>
+  </div>
+
+  <!-- ③ TRAINING -->
+  <div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><div class="island"><div class="id"></div><div class="ic"></div></div><span>100%</span></div>
+    <div class="sc">
+      <span class="sbadge">③ Training</span>
+      <div class="greet"><div class="hi">Diese Woche · verschiebbar</div><div class="name">Trainingsplan</div></div>
+
+      <div class="week">
+        <div class="wd done"><div class="wdd">Mo</div><div class="wdn">10</div><div class="wdi">✓</div></div>
+        <div class="wd active"><div class="wdd">Di</div><div class="wdn">11</div><div class="wdi">↻</div></div>
+        <div class="wd"><div class="wdd">Mi</div><div class="wdn">12</div><div class="wdi">·</div></div>
+        <div class="wd skip"><div class="wdd">Do</div><div class="wdn">13</div><div class="wdi">↷</div></div>
+        <div class="wd"><div class="wdd">Fr</div><div class="wdn">14</div><div class="wdi">·</div></div>
+        <div class="wd"><div class="wdd">Sa</div><div class="wdn">15</div><div class="wdi">·</div></div>
+        <div class="wd"><div class="wdd">So</div><div class="wdn">16</div><div class="wdi">·</div></div>
+      </div>
+
+      <div class="card hero" style="padding:16px 18px;margin-bottom:10px;">
+        <div class="hc-label">Beine + Bauch · Heute</div>
+        <div><span class="hc-num">3</span><span class="hc-unit"> / 6 Übungen</span></div>
+        <div class="pbar"><div class="pfill" style="width:50%"></div></div>
+      </div>
+
+      <div class="sec">Übungen</div>
+      <div class="ex">
+        <div class="exh"><div class="exn">1</div><span class="en">Kniebeugen</span><span class="ck" style="color:rgba(255,255,255,0.80);">✓</span></div>
+        <div class="sets"><div class="s done"><div class="sl">S1</div><div class="sv">15</div></div><div class="s done"><div class="sl">S2</div><div class="sv">12</div></div><div class="s done"><div class="sl">S3</div><div class="sv">12</div></div></div>
+      </div>
+      <div class="ex">
+        <div class="exh"><div class="exn">2</div><span class="en">Ausfallschritte</span><span class="ck" style="font-size:9px;color:var(--text3);">läuft</span></div>
+        <div class="sets"><div class="s done"><div class="sl">S1</div><div class="sv">12</div></div><div class="s"><div class="sl">S2</div><div class="sv">–</div></div><div class="s"><div class="sl">S3</div><div class="sv">–</div></div></div>
+      </div>
+      <div class="ex" style="opacity:.35;">
+        <div class="exh"><div class="exn">3</div><span class="en">Planks</span></div>
+        <div class="sets"><div class="s"><div class="sl">S1</div><div class="sv">60s</div></div><div class="s"><div class="sl">S2</div><div class="sv">60s</div></div><div class="s"><div class="sl">S3</div><div class="sv">60s</div></div></div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ico">⌂</div><div class="lbl">Home</div></div>
+      <div class="ni"><div class="ico">◎</div><div class="lbl">Essen</div></div>
+      <div class="ni on"><div class="ico">◈</div><div class="lbl">Training</div><div class="dot"></div></div>
+      <div class="ni"><div class="ico">↗</div><div class="lbl">Stats</div></div>
+      <div class="ni"><div class="ico">◉</div><div class="lbl">Profil</div></div>
+    </div>
+  </div>
+  <div class="slabel">③ Training · verschiebbar</div>
+  </div>
+
+  <!-- ④ STATS -->
+  <div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><div class="island"><div class="id"></div><div class="ic"></div></div><span>100%</span></div>
+    <div class="sc">
+      <span class="sbadge">④ Fortschritt</span>
+      <div class="greet"><div class="hi">März 2026</div><div class="name">Fortschritt</div></div>
+
+      <div class="stat3">
+        <div class="sc3"><div class="sei">⚖️</div><div class="sel">Gewicht</div><div class="sev">75.5</div><div class="seu">kg</div></div>
+        <div class="sc3"><div class="sei">🔥</div><div class="sel">Streak</div><div class="sev">12</div><div class="seu">Tage</div></div>
+        <div class="sc3"><div class="sei">💪</div><div class="sel">Sessions</div><div class="sev">34</div><div class="seu">Total</div></div>
+      </div>
+
+      <div class="wbal">
+        <div class="wbal-top">
+          <div><div class="wbal-lbl">Wochenbilanz</div><div class="wbal-num">−150 kcal</div></div>
+          <div class="badge go">✓ Auf Kurs</div>
+        </div>
+        <div class="wbal-days">
+          <div class="wbd neg"><div class="dn">Mo</div><div class="dv">−200</div></div>
+          <div class="wbd pos"><div class="dn">Di</div><div class="dv">+300</div></div>
+          <div class="wbd neg"><div class="dn">Mi</div><div class="dv">−150</div></div>
+          <div class="wbd neg"><div class="dn">Do</div><div class="dv">−300</div></div>
+          <div class="wbd pos"><div class="dn">Fr</div><div class="dv">+100</div></div>
+          <div class="wbd zero"><div class="dn">Sa</div><div class="dv">—</div></div>
+          <div class="wbd zero"><div class="dn">So</div><div class="dv">—</div></div>
+        </div>
+      </div>
+
+      <div class="wch">
+        <div class="wch-lbl">Gewicht · 7 Wochen</div>
+        <div class="wch-bars">
+          <div class="bar" style="height:70%"></div><div class="bar" style="height:78%"></div>
+          <div class="bar" style="height:74%"></div><div class="bar" style="height:67%"></div>
+          <div class="bar" style="height:62%"></div><div class="bar" style="height:59%"></div>
+          <div class="bar hi" style="height:52%"></div>
+        </div>
+        <div class="wch-days"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span><span>W7</span></div>
+      </div>
+
+      <div class="streak">
+        <div class="sd on">Mo</div><div class="sd on">Di</div><div class="sd on">Mi</div>
+        <div class="sd on">Do</div><div class="sd now">Fr</div><div class="sd">Sa</div><div class="sd">So</div>
+      </div>
+
+      <div class="feedback">
+        <div class="fb-title">Wochen-Feedback 🎯</div>
+        <div class="fb-text">Überschuss Di & Fr — trotzdem −150 kcal gesamt. Protein Ø 138g. 4/5 Trainings.</div>
+        <div class="fb-badge">💪 Sehr gute Woche</div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ico">⌂</div><div class="lbl">Home</div></div>
+      <div class="ni"><div class="ico">◎</div><div class="lbl">Essen</div></div>
+      <div class="ni"><div class="ico">◈</div><div class="lbl">Training</div></div>
+      <div class="ni on"><div class="ico">↗</div><div class="lbl">Stats</div><div class="dot"></div></div>
+      <div class="ni"><div class="ico">◉</div><div class="lbl">Profil</div></div>
+    </div>
+  </div>
+  <div class="slabel">④ Stats · Wochenbilanz</div>
+  </div>
+
+  <!-- ⑤ PROFIL -->
+  <div class="sw">
+  <div class="phone">
+    <div class="sb"><span>9:41</span><div class="island"><div class="id"></div><div class="ic"></div></div><span>100%</span></div>
+    <div class="sc">
+      <span class="sbadge">⑤ Profil</span>
+      <div class="prof-head">
+        <div class="prof-av">🧑‍💪</div>
+        <div class="prof-name">Lukas</div>
+        <div class="prof-sub">Recomp · seit Feb 2026 · 12 Tage 🔥</div>
+      </div>
+
+      <div class="card hero" style="padding:16px 18px;text-align:center;margin-bottom:12px;">
+        <div class="hc-label">Tagesziel</div>
+        <div><span class="hc-num">2.000</span><span class="hc-unit">kcal</span></div>
+        <div class="hc-sub">150g Protein · 200g Carbs · 65g Fett</div>
+        <div class="pbar"><div class="pfill" style="width:62%"></div></div>
+      </div>
+
+      <div class="sec">Meine Daten</div>
+      <div class="prow"><div class="pi">📏</div><div class="pk">Größe</div><div class="pv">172 cm</div></div>
+      <div class="prow"><div class="pi">⚖️</div><div class="pk">Startgewicht</div><div class="pv">75.5 kg</div></div>
+      <div class="prow"><div class="pi">🎯</div><div class="pk">Zielgewicht</div><div class="pv">70 kg</div></div>
+      <div class="prow"><div class="pi">🎂</div><div class="pk">Alter</div><div class="pv">25 Jahre</div></div>
+      <div class="prow"><div class="pi">🔥</div><div class="pk">Aktivität</div><div class="pv">Sitzend</div></div>
+      <div class="prow"><div class="pi">💪</div><div class="pk">Training / Woche</div><div class="pv">4–6×</div></div>
+    </div>
+    <div class="nav">
+      <div class="ni"><div class="ico">⌂</div><div class="lbl">Home</div></div>
+      <div class="ni"><div class="ico">◎</div><div class="lbl">Essen</div></div>
+      <div class="ni"><div class="ico">◈</div><div class="lbl">Training</div></div>
+      <div class="ni"><div class="ico">↗</div><div class="lbl">Stats</div></div>
+      <div class="ni on"><div class="ico">◉</div><div class="lbl">Profil</div><div class="dot"></div></div>
+    </div>
+  </div>
+  <div class="slabel">⑤ Profil</div>
+  </div>
+
+</div>
+</body>
+</html>
